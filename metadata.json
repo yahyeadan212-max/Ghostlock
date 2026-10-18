@@ -1,0 +1,8 @@
+{
+  "name": "GhostLock — The Free Focus App for Gen Z",
+  "description": "Disappear from distractions. Show up for yourself. 25 minutes, one goal, zero excuses. 100% free with no signup.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #080A09;
+    --bg-surface: #111512;
+    --bg-surface-elevated: #161B16;
+    --neon-green: #B6FF00;
+    --text-primary: #F5F7F2;
+    --text-secondary: #8B948A;
+    --border-dark: #242B24;
+    --border-subtle: #1C221C;
+    --error-red: #EF4444;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #080A09;
+    color: #F5F7F2;
+    overflow-x: hidden;
+  }
+
+  .font-mono-numbers {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Custom subtle glow & utilities */
+.glow-neon {
+  box-shadow: 0 0 25px -5px rgba(182, 255, 0, 0.25);
+}
+
+.glow-neon-sm {
+  box-shadow: 0 0 12px -2px rgba(182, 255, 0, 0.2);
+}
+
+.text-glow-neon {
+  text-shadow: 0 0 16px rgba(182, 255, 0, 0.4);
+}
+
+/* Safe area support for iOS and Android notch devices */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 16px);
+}
