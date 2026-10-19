@@ -39,13 +39,28 @@ export const FocusView: React.FC<FocusViewProps> = ({
   initialPresetGoal,
 }) => {
   // Setup state
-  const [goalInput, setGoalInput] = useState<string>(initialPresetGoal || '');
-  const [selectedDuration, setSelectedDuration] = useState<number>(settings.defaultDurationMinutes || 25);
+  const [goalInput, setGoalInput] = useState<string>(() => {
+    if (initialPresetGoal) return initialPresetGoal;
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('currentGoal');
+      if (stored) return stored;
+    }
+    return '';
+  });
+  const [selectedDuration, setSelectedDuration] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const storedDuration = localStorage.getItem('focusDuration');
+      if (storedDuration && !isNaN(Number(storedDuration))) {
+        return Number(storedDuration);
+      }
+    }
+    return settings.defaultDurationMinutes || 25;
+  });
   const [goalError, setGoalError] = useState<string | null>(null);
 
   // Runtime timer state
   const [remainingSeconds, setRemainingSeconds] = useState<number>(() => {
-    if (!activeSession) return 25 * 60;
+    if (!activeSession) return (selectedDuration || 25) * 60;
     if (activeSession.isPaused) return activeSession.remainingSecondsWhenPaused;
     return Math.max(0, Math.round((activeSession.targetEndTimestamp - Date.now()) / 1000));
   });
@@ -149,6 +164,10 @@ export const FocusView: React.FC<FocusViewProps> = ({
     if (settings.soundEnabled) {
       playLockInSound();
     }
+    try {
+      localStorage.setItem('currentGoal', trimmed);
+      localStorage.setItem('focusDuration', String(selectedDuration));
+    } catch {}
     sessionCompletedRef.current = false;
     setJustCompletedSession(null);
     onStartSession(trimmed, selectedDuration);
@@ -308,22 +327,19 @@ export const FocusView: React.FC<FocusViewProps> = ({
           </aside>
         )}
 
+        {/* Goal shown prominently at top */}
+        <div className="mb-4 max-w-xl w-full text-center">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#F5F7F2] tracking-tight break-words">
+            🎯 Focusing on: <span className="text-[#B6FF00]">{activeSession.goal}</span>
+          </h1>
+        </div>
+
         {/* Subtle active status pill */}
-        <div className="flex items-center gap-2 mb-4 px-3.5 py-1.5 rounded-full border border-[#242B24] bg-[#111512]">
+        <div className="flex items-center gap-2 mb-6 px-3.5 py-1.5 rounded-full border border-[#242B24] bg-[#111512]">
           <span className={`h-2 w-2 rounded-full ${activeSession.isPaused ? 'bg-[#8B948A]' : 'bg-[#B6FF00] animate-pulse'}`} />
           <span className="text-xs font-bold uppercase tracking-wider text-[#8B948A]">
             {activeSession.isPaused ? 'Session Paused' : 'Locked In · Tab Guard Armed'}
           </span>
-        </div>
-
-        {/* The User's Chosen Goal */}
-        <div className="mb-6 max-w-md w-full">
-          <div className="text-[11px] font-bold uppercase tracking-widest text-[#8B948A] mb-1">
-            Current Target
-          </div>
-          <h2 className="text-xl sm:text-2xl font-black text-[#F5F7F2] break-words">
-            "{activeSession.goal}"
-          </h2>
         </div>
 
         {/* Circular Countdown Timer */}
@@ -474,13 +490,18 @@ export const FocusView: React.FC<FocusViewProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            {[15, 25, 50].map((mins) => (
+          <div className="grid grid-cols-4 gap-2.5">
+            {[5, 15, 25, 50].map((mins) => (
               <button
                 key={mins}
                 type="button"
-                onClick={() => setSelectedDuration(mins)}
-                className={`flex flex-col items-center justify-center rounded-xl p-3.5 border transition-all min-h-[48px] ${
+                onClick={() => {
+                  setSelectedDuration(mins);
+                  try {
+                    localStorage.setItem('focusDuration', String(mins));
+                  } catch {}
+                }}
+                className={`flex flex-col items-center justify-center rounded-xl p-3 border transition-all min-h-[48px] ${
                   selectedDuration === mins
                     ? 'border-[#B6FF00] bg-[#161B16] text-[#B6FF00] glow-neon-sm'
                     : 'border-[#242B24] bg-[#111512] text-[#8B948A] hover:border-[#8B948A]/40 hover:text-[#F5F7F2]'
@@ -490,7 +511,7 @@ export const FocusView: React.FC<FocusViewProps> = ({
                   {mins}
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-wider">
-                  Minutes
+                  {mins === 5 ? 'Demo' : 'Mins'}
                 </span>
               </button>
             ))}

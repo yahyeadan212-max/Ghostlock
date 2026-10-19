@@ -68,6 +68,12 @@ export default function App() {
 
   // Handler to start a new focus session
   const handleStartSession = (goal: string, durationMinutes: number) => {
+    // Save to localStorage as currentGoal and focusDuration
+    try {
+      localStorage.setItem('currentGoal', goal);
+      localStorage.setItem('focusDuration', String(durationMinutes));
+    } catch {}
+
     // Track Event 2: LOCK IN click & log goal for admin dashboard
     trackAnalyticsEvent('lock_in_click');
     recordGoalForAdmin(goal, durationMinutes);
@@ -140,11 +146,18 @@ export default function App() {
   };
 
   // Quick navigation from landing page CTA or preset
-  const handleLaunchFromLanding = (selectedPreset?: string) => {
-    if (selectedPreset) {
-      setPresetGoal(selectedPreset);
+  const handleLaunchFromLanding = (goal?: string, durationMinutes?: number) => {
+    const finalDuration = durationMinutes || 25;
+    if (goal && goal.trim()) {
+      const trimmed = goal.trim();
+      setPresetGoal(trimmed);
+      handleStartSession(trimmed, finalDuration);
+    } else {
+      try {
+        localStorage.setItem('focusDuration', String(finalDuration));
+      } catch {}
+      setCurrentView('focus');
     }
-    setCurrentView('focus');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

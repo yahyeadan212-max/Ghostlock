@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Lock, ArrowRight, Play, CheckCircle2, Shield, Eye, Flame, Award, Clock } from 'lucide-react';
 import { AppView } from '../types';
 
 interface LandingPageProps {
-  onStartFocus: (presetGoal?: string) => void;
+  onStartFocus: (presetGoal?: string, durationMinutes?: number) => void;
   onNavigate: (view: AppView) => void;
   currentStreak: number;
 }
@@ -13,6 +13,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onNavigate,
   currentStreak,
 }) => {
+  const [heroGoal, setHeroGoal] = useState<string>('');
+
+  const handleStart25Min = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const goal = heroGoal.trim() || 'Deep Work Session';
+    try {
+      localStorage.setItem('currentGoal', goal);
+      localStorage.setItem('focusDuration', '25');
+    } catch {}
+    onStartFocus(goal, 25);
+  };
+
+  const handleStart5MinDemo = () => {
+    const goal = heroGoal.trim() || '5-Min Focus Sprint';
+    try {
+      localStorage.setItem('currentGoal', goal);
+      localStorage.setItem('focusDuration', '5');
+    } catch {}
+    onStartFocus(goal, 5);
+  };
+
   return (
     <div className="flex flex-col">
       {/* HERO SECTION */}
@@ -35,9 +56,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </span>
               </div>
 
-              {/* Headline */}
+              {/* Headline - User requirement: "What will you finish in the next 25 mins?" */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#F5F7F2] leading-[1.08] max-w-2xl mb-6">
-                Your phone is stealing your life. <span className="text-[#B6FF00]">Lock in.</span>
+                What will you finish in the <span className="text-[#B6FF00]">next 25 mins?</span>
               </h1>
 
               {/* Supporting Text */}
@@ -45,33 +66,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 25 minutes. One goal. Zero excuses.
               </p>
               
-              <p className="text-base text-[#8B948A] leading-relaxed max-w-xl mb-8">
+              <p className="text-base text-[#8B948A] leading-relaxed max-w-xl mb-6">
                 GhostLock helps you build focus, one session at a time. No subscriptions. No paywalls. Just you versus distraction.
               </p>
 
-              {/* Primary CTA button */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto mb-4">
-                <button
-                  onClick={() => onStartFocus()}
-                  className="group flex items-center justify-center gap-3 rounded-xl bg-[#B6FF00] px-8 py-4 text-sm font-black uppercase tracking-wider text-[#080A09] transition-all hover:bg-[#c6ff24] active:scale-[0.98] glow-neon min-h-[52px]"
-                >
-                  <span>START FREE — NO SIGNUP</span>
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </button>
+              {/* Conversion Hero Form: Input field BEFORE button */}
+              <form onSubmit={handleStart25Min} className="w-full max-w-lg mb-3">
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    value={heroGoal}
+                    onChange={(e) => setHeroGoal(e.target.value)}
+                    placeholder="e.g. Finish math homework, write essay..."
+                    className="w-full rounded-2xl border border-[#242B24] bg-[#111512] px-5 py-4 text-base font-medium text-[#F5F7F2] placeholder-[#556054] outline-none focus:border-[#B6FF00] focus:ring-1 focus:ring-[#B6FF00] transition-all"
+                  />
+                </div>
 
+                {/* Main button text: "START 25 MIN FOCUS →" */}
                 <button
-                  onClick={() => {
-                    const el = document.getElementById('how-it-works');
-                    el?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-[#242B24] bg-[#111512] px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#F5F7F2] transition-colors hover:border-[#8B948A] hover:bg-[#161B16] min-h-[52px]"
+                  type="submit"
+                  className="w-full group flex items-center justify-center gap-2 rounded-2xl bg-[#B6FF00] px-8 py-4 text-sm sm:text-base font-black uppercase tracking-wider text-[#080A09] transition-all hover:bg-[#c6ff24] active:scale-[0.98] glow-neon min-h-[54px]"
                 >
-                  <span>HOW IT WORKS</span>
+                  <span>START 25 MIN FOCUS →</span>
                 </button>
-              </div>
+              </form>
 
-              {/* Secondary reassurance text */}
-              <p className="text-xs font-medium text-[#8B948A] flex items-center gap-2">
+              {/* Under button small text: "No quit button. No distractions. Just work." */}
+              <p className="text-xs text-[#8B948A] font-medium mb-2.5">
+                No quit button. No distractions. Just work.
+              </p>
+
+              {/* Under that link/button: "Nervous? Try 5-min demo" */}
+              <button
+                type="button"
+                onClick={handleStart5MinDemo}
+                className="text-xs font-semibold text-[#8B948A] hover:text-[#B6FF00] transition-colors underline underline-offset-4 mb-4 cursor-pointer"
+              >
+                Nervous? Try 5-min demo
+              </button>
+
+              {/* Reassurance text */}
+              <p className="text-xs font-medium text-[#556054] flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#B6FF00]" />
                 100% free. No credit card. No account required.
               </p>
@@ -88,10 +123,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Right Column: Prominent Visual Preview of the Actual Focus Timer */}
             <div className="lg:col-span-5 w-full flex justify-center">
               <div 
-                onClick={() => onStartFocus()}
+                onClick={() => handleStart25Min()}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter') onStartFocus(); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleStart25Min(); }}
                 className="group relative w-full max-w-sm rounded-3xl border border-[#242B24] bg-[#111512] p-6 sm:p-8 transition-all hover:border-[#B6FF00]/50 hover:shadow-2xl hover:shadow-[#B6FF00]/10 cursor-pointer text-center"
               >
                 {/* Active Indicator Top Strip */}
@@ -113,7 +148,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     Current Objective
                   </div>
                   <div className="text-lg font-bold text-[#F5F7F2] line-clamp-1">
-                    Complete assignment thesis
+                    {heroGoal.trim() || 'Complete assignment thesis'}
                   </div>
                 </div>
 
@@ -146,10 +181,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   {/* Central Numerals */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <span className="font-mono-numbers text-4xl sm:text-5xl font-extrabold tracking-tight text-[#F5F7F2]">
-                      19:42
+                      24:59
                     </span>
                     <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8B948A] mt-1">
-                      78% Remaining
+                      Ready to lock in
                     </span>
                   </div>
                 </div>
@@ -158,7 +193,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="pt-4 flex items-center justify-center gap-3">
                   <div className="flex items-center justify-center gap-2 rounded-xl bg-[#B6FF00] px-5 py-2.5 text-xs font-black uppercase text-[#080A09] group-hover:scale-105 transition-transform">
                     <Play className="h-3.5 w-3.5 fill-[#080A09]" />
-                    <span>Click to Launch</span>
+                    <span>START 25 MIN FOCUS →</span>
                   </div>
                 </div>
 
@@ -364,7 +399,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 ].map((target) => (
                   <button
                     key={target}
-                    onClick={() => onStartFocus(target)}
+                    onClick={() => {
+                      try {
+                        localStorage.setItem('currentGoal', target);
+                        localStorage.setItem('focusDuration', '25');
+                      } catch {}
+                      onStartFocus(target, 25);
+                    }}
                     className="w-full flex items-center justify-between p-3.5 rounded-xl border border-[#242B24] bg-[#111512] hover:border-[#B6FF00] hover:bg-[#161B16] transition-all text-left group min-h-[44px]"
                   >
                     <span className="text-sm font-medium text-[#F5F7F2] group-hover:text-[#B6FF00] transition-colors">
@@ -390,11 +431,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </p>
 
           <button
-            onClick={() => onStartFocus()}
-            className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#B6FF00] px-10 py-5 text-sm font-black uppercase tracking-wider text-[#080A09] transition-all hover:bg-[#c6ff24] active:scale-[0.98] glow-neon min-h-[52px]"
+            onClick={() => handleStart25Min()}
+            className="inline-flex items-center justify-center gap-3 rounded-2xl bg-[#B6FF00] px-10 py-5 text-sm sm:text-base font-black uppercase tracking-wider text-[#080A09] transition-all hover:bg-[#c6ff24] active:scale-[0.98] glow-neon min-h-[54px]"
           >
-            <span>LOCK IN NOW</span>
-            <ArrowRight className="h-4 w-4" />
+            <span>START 25 MIN FOCUS →</span>
           </button>
         </div>
       </section>
