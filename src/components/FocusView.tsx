@@ -6,6 +6,7 @@ import {
 import { ActiveSessionState, UserStats, UserSettings, AppView } from '../types';
 import { BreakLockModal } from './BreakLockModal';
 import { ShareModal } from './ShareModal';
+import { SurvivedOneMinModal } from './SurvivedOneMinModal';
 import { playLockInSound, playCompletionSound } from '../utils/audio';
 
 interface FocusViewProps {
@@ -38,7 +39,7 @@ export const FocusView: React.FC<FocusViewProps> = ({
   onNavigate,
   initialPresetGoal,
 }) => {
-  // Setup state
+  // Setup state - Default to 1 min for first-time visitors as requested
   const [goalInput, setGoalInput] = useState<string>(() => {
     if (initialPresetGoal) return initialPresetGoal;
     if (typeof window !== 'undefined') {
@@ -54,7 +55,7 @@ export const FocusView: React.FC<FocusViewProps> = ({
         return Number(storedDuration);
       }
     }
-    return settings.defaultDurationMinutes || 25;
+    return settings.defaultDurationMinutes || 1;
   });
   const [goalError, setGoalError] = useState<string | null>(null);
 
@@ -68,6 +69,7 @@ export const FocusView: React.FC<FocusViewProps> = ({
   // Modal & notification state
   const [showBreakModal, setShowBreakModal] = useState<boolean>(false);
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
+  const [showSurvivedModal, setShowSurvivedModal] = useState<boolean>(false);
   const [distractionNotice, setDistractionNotice] = useState<string | null>(null);
   const [justCompletedSession, setJustCompletedSession] = useState<{
     goal: string;
@@ -112,6 +114,12 @@ export const FocusView: React.FC<FocusViewProps> = ({
           goal: activeSession.goal,
           duration: activeSession.durationMinutes,
         });
+
+        // Gen Z Conversion: If completed 1 min session, show survive popup dare
+        if (activeSession.durationMinutes <= 1) {
+          setShowSurvivedModal(true);
+        }
+
         onSessionComplete(activeSession.goal, activeSession.durationMinutes);
       }
     };
@@ -286,6 +294,18 @@ export const FocusView: React.FC<FocusViewProps> = ({
           durationMinutes={justCompletedSession.duration}
           totalCompletedSessions={stats.totalCompletedSessions}
           currentStreak={stats.currentStreak}
+        />
+
+        <SurvivedOneMinModal
+          isOpen={showSurvivedModal}
+          goal={justCompletedSession.goal}
+          onLock25Mins={() => {
+            setShowSurvivedModal(false);
+            const nextGoal = justCompletedSession.goal || '25-Min Deep Focus';
+            setJustCompletedSession(null);
+            onStartSession(nextGoal, 25);
+          }}
+          onDismiss={() => setShowSurvivedModal(false)}
         />
       </div>
     );
@@ -479,19 +499,19 @@ export const FocusView: React.FC<FocusViewProps> = ({
           )}
         </div>
 
-        {/* Duration Selector: Presets 15, 25, 50 mins */}
+        {/* Duration Selector: Presets 1 (Dare), 5, 25, 50 mins */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold uppercase tracking-wider text-[#8B948A]">
               Focus Duration
             </span>
-            <span className="text-xs text-[#556054]">
-              Default: 25 minutes
+            <span className="text-xs text-[#B6FF00] font-semibold">
+              Default: 1 min dare
             </span>
           </div>
 
           <div className="grid grid-cols-4 gap-2.5">
-            {[5, 15, 25, 50].map((mins) => (
+            {[1, 5, 25, 50].map((mins) => (
               <button
                 key={mins}
                 type="button"
@@ -511,7 +531,7 @@ export const FocusView: React.FC<FocusViewProps> = ({
                   {mins}
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-wider">
-                  {mins === 5 ? 'Demo' : 'Mins'}
+                  {mins === 1 ? '🔥 Dare' : mins === 5 ? 'Sprint' : mins === 25 ? 'Deep' : 'God'}
                 </span>
               </button>
             ))}

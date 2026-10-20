@@ -59,7 +59,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             It operates entirely in your browser and cannot physically block system-level applications or external websites.
           </p>
           <p className="shrink-0 text-xs text-[#556054]">
-            © {new Date().getFullYear()} GhostLock. Zero telemetry.
+            © {new Date().getFullYear()} GhostLock. 100% private.
           </p>
         </div>
       </div>

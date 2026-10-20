@@ -145,9 +145,9 @@ export default function App() {
     saveSettings(newSettings);
   };
 
-  // Quick navigation from landing page CTA or preset
+  // Quick navigation from landing page CTA or preset - default 1 min
   const handleLaunchFromLanding = (goal?: string, durationMinutes?: number) => {
-    const finalDuration = durationMinutes || 25;
+    const finalDuration = durationMinutes || 1;
     if (goal && goal.trim()) {
       const trimmed = goal.trim();
       setPresetGoal(trimmed);

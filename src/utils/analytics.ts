@@ -1,6 +1,6 @@
 import { AnalyticsStats } from '../types';
 
-export const COUNTAPI_NAMESPACE = 'ghostlock2026';
+export const GLOBAL_APP_KEY = 'ghostlock2026';
 
 export type AnalyticsEvent = 'page_visit' | 'lock_in_click' | 'session_completed';
 
@@ -117,7 +117,7 @@ export function resetLocalCounters(): AnalyticsStorage {
 
 /**
  * Tracks an event using CountAPI (https://api.countapi.xyz) under
- * namespace 'ghostlock2026' with resilient fallback.
+ * key 'ghostlock2026' with resilient fallback.
  */
 export async function trackAnalyticsEvent(event: AnalyticsEvent): Promise<number> {
   const local = incrementLocalCounter(event);
@@ -126,8 +126,7 @@ export async function trackAnalyticsEvent(event: AnalyticsEvent): Promise<number
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2500);
 
-    // CountAPI hit endpoint: https://api.countapi.xyz/hit/{namespace}/{key}
-    const res = await fetch(`https://api.countapi.xyz/hit/${COUNTAPI_NAMESPACE}/${event}`, {
+    const res = await fetch(`https://api.countapi.xyz/hit/${GLOBAL_APP_KEY}/${event}`, {
       signal: controller.signal,
       headers: {
         'Accept': 'application/json',
@@ -162,15 +161,14 @@ export async function fetchAnalyticsStats(): Promise<AnalyticsStats> {
   let lockIns = local.lock_in_click;
   let completions = local.session_completed;
 
-  // Try fetching current counts from CountAPI: https://api.countapi.xyz/get/{namespace}/{key}
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2500);
 
     const [vRes, lRes, cRes] = await Promise.allSettled([
-      fetch(`https://api.countapi.xyz/get/${COUNTAPI_NAMESPACE}/page_visit`, { signal: controller.signal }),
-      fetch(`https://api.countapi.xyz/get/${COUNTAPI_NAMESPACE}/lock_in_click`, { signal: controller.signal }),
-      fetch(`https://api.countapi.xyz/get/${COUNTAPI_NAMESPACE}/session_completed`, { signal: controller.signal }),
+      fetch(`https://api.countapi.xyz/get/${GLOBAL_APP_KEY}/page_visit`, { signal: controller.signal }),
+      fetch(`https://api.countapi.xyz/get/${GLOBAL_APP_KEY}/lock_in_click`, { signal: controller.signal }),
+      fetch(`https://api.countapi.xyz/get/${GLOBAL_APP_KEY}/session_completed`, { signal: controller.signal }),
     ]);
 
     clearTimeout(timeoutId);

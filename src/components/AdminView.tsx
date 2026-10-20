@@ -6,7 +6,7 @@ import {
 import { AnalyticsStats, AppView } from '../types';
 import { 
   fetchAnalyticsStats, resetLocalCounters, getRecentGoals, 
-  LoggedGoal, COUNTAPI_NAMESPACE 
+  LoggedGoal, GLOBAL_APP_KEY 
 } from '../utils/analytics';
 
 interface AdminViewProps {
@@ -112,7 +112,7 @@ export const AdminView: React.FC<AdminViewProps> = ({ onNavigate, onLogout }) =>
             GhostLock Admin
           </h2>
           <p className="text-xs text-[#8B948A] mb-6">
-            Enter the admin password to view system telemetry, focus goals, and global analytics.
+            Enter the admin password to view focus goals and global analytics.
           </p>
 
           <form onSubmit={handlePasswordSubmit} className="space-y-4 text-left">
@@ -183,13 +183,13 @@ export const AdminView: React.FC<AdminViewProps> = ({ onNavigate, onLogout }) =>
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#242B24] bg-[#111512] px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#B6FF00] mb-2">
             <Shield className="h-3.5 w-3.5" />
-            <span>PROTECTED /ADMIN CONSOLE</span>
+            <span>GHOSTLOCK PRIVATE ACCESS</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#F5F7F2]">
-            System Dashboard
+            Overview
           </h1>
           <p className="text-sm text-[#8B948A] mt-1">
-            Tracking users, focus sessions, live goals, and retention metrics.
+            Live user sessions, goals, and focus completion rates.
           </p>
         </div>
 
@@ -232,7 +232,7 @@ export const AdminView: React.FC<AdminViewProps> = ({ onNavigate, onLogout }) =>
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#111512] border border-[#242B24] text-[#B6FF00] animate-pulse">
             <RefreshCw className="h-6 w-6 animate-spin" />
           </div>
-          <div className="text-sm font-bold text-[#F5F7F2]">Loading telemetry & goals...</div>
+          <div className="text-sm font-bold text-[#F5F7F2]">Loading stats & goals...</div>
         </div>
       ) : stats ? (
         <div className="space-y-8">
@@ -380,7 +380,7 @@ export const AdminView: React.FC<AdminViewProps> = ({ onNavigate, onLogout }) =>
             )}
           </div>
 
-          {/* SECTION 3: SYSTEM TELEMETRY & STATS */}
+          {/* SECTION 3: SYSTEM OVERVIEW & STATS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             
             <div className="p-5 rounded-2xl bg-[#111512] border border-[#242B24]">
@@ -397,20 +397,20 @@ export const AdminView: React.FC<AdminViewProps> = ({ onNavigate, onLogout }) =>
 
             <div className="p-5 rounded-2xl bg-[#111512] border border-[#242B24]">
               <div className="text-xs font-bold uppercase tracking-wider text-[#8B948A] mb-1">
-                CountAPI Namespace
+                Active Sync Key
               </div>
               <div className="font-mono-numbers text-xl font-bold text-[#B6FF00] truncate">
-                {COUNTAPI_NAMESPACE}
+                {GLOBAL_APP_KEY}
               </div>
               <p className="text-xs text-[#556054] mt-2">
-                Active telemetry namespace keys: visits, lock-ins, completions.
+                Active sync counters: visits, lock-ins, completions.
               </p>
             </div>
 
             <div className="p-5 rounded-2xl bg-[#111512] border border-[#242B24] flex flex-col justify-between">
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-[#8B948A] mb-1">
-                  Telemetry Management
+                  Counter Controls
                 </div>
                 <p className="text-xs text-[#556054]">
                   Reset local count mirrors back to zero if needed.
@@ -440,7 +440,7 @@ export const AdminView: React.FC<AdminViewProps> = ({ onNavigate, onLogout }) =>
                   RESET DASHBOARD COUNTS?
                 </h4>
                 <p className="text-xs text-[#8B948A] leading-relaxed mb-6">
-                  This will reset your local telemetry counters back to 0.
+                  This will reset your local counters back to 0.
                 </p>
                 <div className="flex flex-col gap-2.5">
                   <button

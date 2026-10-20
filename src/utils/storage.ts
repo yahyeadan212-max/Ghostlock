@@ -15,7 +15,7 @@ export function getLocalDateString(date: Date = new Date()): string {
 
 export function getDefaultSettings(): UserSettings {
   return {
-    defaultDurationMinutes: 25,
+    defaultDurationMinutes: 1, // 1 min dare default for first-time visitors
     soundEnabled: true,
     motivationalPromptsEnabled: true,
     ambientSound: 'none',

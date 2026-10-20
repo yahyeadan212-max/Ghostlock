@@ -80,19 +80,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 mt-5">
-            {[15, 25, 50].map((mins) => (
+          <div className="grid grid-cols-4 gap-2.5 mt-5">
+            {[1, 5, 25, 50].map((mins) => (
               <button
                 key={mins}
                 type="button"
                 onClick={() => handleDurationChange(mins)}
-                className={`py-3 px-4 rounded-xl border text-center font-mono-numbers text-sm font-bold transition-all min-h-[44px] ${
+                className={`py-3 px-2 rounded-xl border text-center font-mono-numbers text-xs sm:text-sm font-bold transition-all min-h-[44px] ${
                   settings.defaultDurationMinutes === mins
                     ? 'border-[#B6FF00] bg-[#161B16] text-[#B6FF00] glow-neon-sm'
                     : 'border-[#242B24] bg-[#080A09] text-[#8B948A] hover:border-[#8B948A]'
                 }`}
               >
-                {mins} Minutes
+                {mins === 1 ? '1 Min Dare' : `${mins} Mins`}
               </button>
             ))}
           </div>
